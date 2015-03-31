@@ -17,7 +17,7 @@ var ChatConstants = require('../constants/ChatConstants');
 var ActionTypes = ChatConstants.ActionTypes;
 
 module.exports = {
-
+	// So here we define the click thread event (action)
   clickThread: function(threadID) {
     ChatAppDispatcher.handleViewAction({
       type: ActionTypes.CLICK_THREAD,

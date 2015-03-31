@@ -27,6 +27,8 @@ module.exports = {
     var rawMessages = JSON.parse(localStorage.getItem('messages'));
 
     // simulate success callback
+		// The event (action) creator will create the event, then call dispatcher to dispatch it.
+		// Because it is a sever, so use receive all.
     ChatServerActionCreators.receiveAll(rawMessages);
   },
 

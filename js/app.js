@@ -20,6 +20,7 @@ window.React = React; // export for http://fb.me/react-devtools
 
 ChatExampleData.init(); // load example data into localstorage
 
+// Inside, we call util -> event creator -> event -> store -> ...
 ChatWebAPIUtils.getAllMessages();
 
 React.render(

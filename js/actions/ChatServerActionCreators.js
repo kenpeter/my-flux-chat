@@ -19,6 +19,7 @@ module.exports = {
 
   receiveAll: function(rawMessages) {
     ChatAppDispatcher.handleServerAction({
+			// This pass to message store.			
       type: ActionTypes.RECEIVE_RAW_MESSAGES,
       rawMessages: rawMessages
     });

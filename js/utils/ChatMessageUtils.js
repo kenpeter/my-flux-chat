@@ -14,6 +14,25 @@ module.exports = {
 
 	// Why do we have rawMessage here?
   convertRawMessage: function(rawMessage, currentThreadID) {
+		/*
+		 * rawMessage ---
+		 * id:
+		 * threadID: the message itself has threadID (i.e. groupID)
+		 * authorName:
+		 * timestamp: unix timestamp
+		 * text:
+		 *
+		 * After conversion ---
+		 * id:
+		 * threadID:
+		 * authroName:
+		 * date: date object
+		 * text:
+		 * isRead: this is the new thing! (ThreadStore has a prop called currentThreadID to keep track which is viewing currently)
+		 *
+		 * isRead: because a single thread contains many messages, so if a thread is read, then all messages are read.
+		 */
+
     return {
       id: rawMessage.id,
       threadID: rawMessage.threadID,
@@ -24,7 +43,7 @@ module.exports = {
     };
   },
 
-	// So we recreate the message.
+	// Grep the text and currentThreadID and create the actual message, passing around the system. 
   getCreatedMessageData: function(text, currentThreadID) {
     var timestamp = Date.now();
     return {

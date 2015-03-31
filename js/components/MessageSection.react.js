@@ -35,6 +35,7 @@ function getMessageListItem(message) {
 var MessageSection = React.createClass({
 
   getInitialState: function() {
+		// The state is message + currentThread?? 			
     return getStateFromStores();
   },
 
@@ -52,13 +53,12 @@ var MessageSection = React.createClass({
   render: function() {
     var messageListItems = this.state.messages.map(getMessageListItem);
     return (
-			{/* Message on the right hand side */}				
+			/* The coment style become this, instead of this: https://facebook.github.io/react/docs/jsx-in-depth.html */			
       <div className="message-section">
         <h3 className="message-thread-heading">{this.state.thread.name}</h3>
         <ul className="message-list" ref="messageList">
           {messageListItems}
         </ul>
-				{/* We pass threadID here */}	
         <MessageComposer threadID={this.state.thread.id}/>
       </div>
     );

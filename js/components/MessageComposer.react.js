@@ -15,6 +15,7 @@ var React = require('react');
 
 var ENTER_KEY_CODE = 13;
 
+// This is the textbox for typing.
 var MessageComposer = React.createClass({
 
   propTypes: {
@@ -40,18 +41,24 @@ var MessageComposer = React.createClass({
     );
   },
 
+	// As usual, many listeners on a single component.
   _onChange: function(event, value) {
-		// Everytime we change the text, we mointors it.			
+		// We need to monitor every letter is typed, because we are not
+		// submitting the entire composed box, but rather it is this.state.text.
+		// This forces us to onChange the event.target.value.			
     this.setState({text: event.target.value});
   },
 
 	// Type something in textbox, then submit
+	// As usual, many listeners on a single component.
   _onKeyDown: function(event) {
     if (event.keyCode === ENTER_KEY_CODE) {
 			// Prevent following link or preventing submit a form.				
       event.preventDefault();
       var text = this.state.text.trim();
       if (text) {
+				// ChatMessageActionCreators normally just fire events, but here we also have
+				// createMessage which is coming from util, so it combines firing event and some utils.			
         ChatMessageActionCreators.createMessage(text, this.props.threadID);
       }
 

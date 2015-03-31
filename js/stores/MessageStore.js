@@ -20,8 +20,11 @@ var assign = require('object-assign');
 var ActionTypes = ChatConstants.ActionTypes;
 var CHANGE_EVENT = 'change';
 
+// So message store tracks it own messages
 var _messages = {};
 
+// Convert raw message into proper message, then store into
+// the tracking _messages 
 function _addMessages(rawMessages) {
   rawMessages.forEach(function(message) {
     if (!_messages[message.id]) {
@@ -33,6 +36,7 @@ function _addMessages(rawMessages) {
   });
 }
 
+// Mark it as all read.
 function _markAllInThreadRead(threadID) {
   for (var id in _messages) {
     if (_messages[id].threadID === threadID) {
@@ -43,6 +47,7 @@ function _markAllInThreadRead(threadID) {
 
 var MessageStore = assign({}, EventEmitter.prototype, {
 
+	// The message store wrap the this.emit.
   emitChange: function() {
     this.emit(CHANGE_EVENT);
   },
@@ -58,10 +63,12 @@ var MessageStore = assign({}, EventEmitter.prototype, {
     this.removeListener(CHANGE_EVENT, callback);
   },
 
+	// Get a single message
   get: function(id) {
     return _messages[id];
   },
 
+	// Return all messages
   getAll: function() {
     return _messages;
   },
@@ -71,11 +78,14 @@ var MessageStore = assign({}, EventEmitter.prototype, {
    */
   getAllForThread: function(threadID) {
     var threadMessages = [];
+		// We push all messages into current thread.
     for (var id in _messages) {
       if (_messages[id].threadID === threadID) {
         threadMessages.push(_messages[id]);
       }
     }
+
+		// We sort the message as well.
     threadMessages.sort(function(a, b) {
       if (a.date < b.date) {
         return -1;
@@ -87,6 +97,7 @@ var MessageStore = assign({}, EventEmitter.prototype, {
     return threadMessages;
   },
 
+	// Pass the current thread id to get_all_msg_for_a_thread.
   getAllForCurrentThread: function() {
     return this.getAllForThread(ThreadStore.getCurrentID());
   }
@@ -99,12 +110,15 @@ MessageStore.dispatchToken = ChatAppDispatcher.register(function(payload) {
   switch(action.type) {
 
     case ActionTypes.CLICK_THREAD:
+			// Message store, thread store and unread thread store all care about click_thread, why?
+			// For message store, it needs to wait for thread store to finish, then it can mark message in this thread read. 			
       ChatAppDispatcher.waitFor([ThreadStore.dispatchToken]);
       _markAllInThreadRead(ThreadStore.getCurrentID());
       MessageStore.emitChange();
       break;
 
     case ActionTypes.CREATE_MESSAGE:
+			// When we press the enter key, then we receive this event.
       var message = ChatMessageUtils.getCreatedMessageData(
         action.text,
         action.currentThreadID
@@ -115,14 +129,21 @@ MessageStore.dispatchToken = ChatAppDispatcher.register(function(payload) {
 
     case ActionTypes.RECEIVE_RAW_MESSAGES:
       _addMessages(action.rawMessages);
+			// 1. So the app dispatcher waits for any store's dispatch token.
+			// 2. So each store has a thing called dispatchToken, which is just a switch-case statement.
+			// 3. Basically, the dispatcher stores the dispatch tokens, then monitor them in the pending loop.
+			// 4. So in this case, the message store waits for the thread to finish. Once it is done, it continues the rest of 
+			// code, which marks all messages read in the thread
       ChatAppDispatcher.waitFor([ThreadStore.dispatchToken]);
       _markAllInThreadRead(ThreadStore.getCurrentID());
       MessageStore.emitChange();
       break;
 
 		// Gary
-		// So basically, there is no handle for RECEIVE_RAW_CREATED_MESSAGE	
-		case ActionTypes.RECEIVE_RAW_CREATED_MESSAGE 
+		// So basically, there is no handle for RECEIVE_RAW_CREATED_MESSAGE
+		// It is mainly used by simulating server to receive message	
+		case ActionTypes.RECEIVE_RAW_CREATED_MESSAGE:
+		 	console.log('RECEIVE_RAW_CREATED_MESSAGE');	
 			break;
 
     default:
