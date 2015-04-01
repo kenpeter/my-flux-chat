@@ -16,12 +16,20 @@ var ReactPropTypes = React.PropTypes;
 
 var MessageListItem = React.createClass({
 
+	// <MessageListItem
+	// 	key={message.id}
+	//  message={message}
+	// />
+	//
+	// So the key is predefined and what we need to define here is message property.
   propTypes: {
     message: ReactPropTypes.object
   },
 
   render: function() {
+		// We define message above, then we can get it from this.props.message.			
     var message = this.props.message;
+
     return (
       <li className="message-list-item">
         <h5 className="message-author-name">{message.authorName}</h5>

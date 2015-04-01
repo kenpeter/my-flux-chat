@@ -30,6 +30,8 @@ var MessageComposer = React.createClass({
   },
 
   render: function() {
+		// So we can either attach listeners to the component itself in tag style or
+		// use adding listeners and remove listeners.
     return (
       <textarea
         className="message-composer"
@@ -58,7 +60,10 @@ var MessageComposer = React.createClass({
       var text = this.state.text.trim();
       if (text) {
 				// ChatMessageActionCreators normally just fire events, but here we also have
-				// createMessage which is coming from util, so it combines firing event and some utils.			
+				// createMessage which is coming from util, so it combines firing event and some utils.
+				//
+				// We use this.props.threadID here, which is defined above.
+				// When using prop which means other components can pass stuff, while state means internal state.
         ChatMessageActionCreators.createMessage(text, this.props.threadID);
       }
 

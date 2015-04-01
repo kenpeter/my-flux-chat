@@ -18,11 +18,16 @@ var ThreadStore = require('../stores/ThreadStore');
 
 function getStateFromStores() {
   return {
+		// Get current messages.			
     messages: MessageStore.getAllForCurrentThread(),
+
+		// Thread contains id, name of thread and lastMessage. Why lastMessage???
+		// So it can be the latest thread				
     thread: ThreadStore.getCurrent()
   };
 }
 
+// Use message.map, see below
 function getMessageListItem(message) {
   return (
     <MessageListItem
@@ -39,37 +44,49 @@ var MessageSection = React.createClass({
     return getStateFromStores();
   },
 
+	// Initial after mount.
   componentDidMount: function() {
     this._scrollToBottom();
     MessageStore.addChangeListener(this._onChange);
     ThreadStore.addChangeListener(this._onChange);
   },
 
+	// Unmount after it is destroied.
   componentWillUnmount: function() {
     MessageStore.removeChangeListener(this._onChange);
     ThreadStore.removeChangeListener(this._onChange);
   },
 
   render: function() {
+		// messages.map is an array, then passing each element to getMessageListItem			
     var messageListItems = this.state.messages.map(getMessageListItem);
+
     return (
-			/* The coment style become this, instead of this: https://facebook.github.io/react/docs/jsx-in-depth.html */			
+			// Outside of html, normal comment style.				
       <div className="message-section">
         <h3 className="message-thread-heading">{this.state.thread.name}</h3>
+				{ /* Inside html, we still have the jsx comment style: https://facebook.github.io/react/docs/jsx-in-depth.html */ }
+				{ /* So we pass the ref here */ }
         <ul className="message-list" ref="messageList">
           {messageListItems}
         </ul>
+				{/* We know anytime, which thread we are in */}
         <MessageComposer threadID={this.state.thread.id}/>
       </div>
     );
   },
 
   componentDidUpdate: function() {
+		// Acting like a listener.				
     this._scrollToBottom();
   },
 
   _scrollToBottom: function() {
+		// the refs: https://facebook.github.io/react/docs/more-about-refs.html			
     var ul = this.refs.messageList.getDOMNode();
+		// scrollHeight is height + padding of element
+		// scrollTop is the scroll bar to the top.
+		// so scroll to bottom
     ul.scrollTop = ul.scrollHeight;
   },
 

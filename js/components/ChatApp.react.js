@@ -15,7 +15,7 @@ var React = require('react');
 var ThreadSection = require('./ThreadSection.react');
 
 var ChatApp = React.createClass({
-
+	// Left is the thread, right is the messages
   render: function() {
     return (
       <div className="chatapp">
