@@ -17,6 +17,11 @@ var ThreadStore = require('../stores/ThreadStore');
 var UnreadThreadStore = require('../stores/UnreadThreadStore');
 
 function getStateFromStores() {
+
+	// state:
+	// 1. threads in order
+	// 2. currentThreadID 
+	// 3. unreadCount
   return {
     threads: ThreadStore.getAllChrono(),
     currentThreadID: ThreadStore.getCurrentID(),
@@ -30,6 +35,7 @@ var ThreadSection = React.createClass({
     return getStateFromStores();
   },
 
+	// Did mount, add listeners, why we have read and unread thread stores?
   componentDidMount: function() {
     ThreadStore.addChangeListener(this._onChange);
     UnreadThreadStore.addChangeListener(this._onChange);
@@ -56,6 +62,7 @@ var ThreadSection = React.createClass({
       <span>Unread threads: {this.state.unreadCount}</span>;
     return (
       <div className="thread-section">
+				{/* The unread on the top */}
         <div className="thread-count">
           {unread}
         </div>

@@ -19,12 +19,15 @@ var assign = require('object-assign');
 var ActionTypes = ChatConstants.ActionTypes;
 var CHANGE_EVENT = 'change';
 
+// It tracks what is the current thread and all the latest sing message in a thread.
 var _currentID = null;
 var _threads = {};
 
 var ThreadStore = assign({}, EventEmitter.prototype, {
 
+	// Basically, what init does is rebuild the all the threads with latest message.
   init: function(rawMessages) {
+					
     rawMessages.forEach(function(message) {
       var threadID = message.threadID;
       var thread = _threads[threadID];
@@ -38,11 +41,13 @@ var ThreadStore = assign({}, EventEmitter.prototype, {
       };
     }, this);
 
+		// Get current thread id
     if (!_currentID) {
       var allChrono = this.getAllChrono();
       _currentID = allChrono[allChrono.length - 1].id;
     }
 
+		// _threads only has the last message.
     _threads[_currentID].lastMessage.isRead = true;
   },
 
@@ -75,6 +80,7 @@ var ThreadStore = assign({}, EventEmitter.prototype, {
     return _threads;
   },
 
+	// Sort them and the find out which thread has the latest message
   getAllChrono: function() {
     var orderedThreads = [];
     for (var id in _threads) {
@@ -114,6 +120,10 @@ ThreadStore.dispatchToken = ChatAppDispatcher.register(function(payload) {
       break;
 
     case ActionTypes.RECEIVE_RAW_MESSAGES:
+			// Why do I need to init ThreadStore, when it receives a raw message?
+			// Answer: have a look at the thread interface, which is all thread displaying the latest message.
+			//
+			// The action (event) contain the message type + additional data
       ThreadStore.init(action.rawMessages);
       ThreadStore.emitChange();
       break;
